@@ -13,9 +13,9 @@ type Request struct {
 	LatencyC int
 	LatencyA int
 	LatencyB int
-	ResultA string
-	ResultB string
-	ResultC string
+	ResultA  string
+	ResultB  string
+	ResultC  string
 }
 
 var avgExecutionRequest [1000]int64
@@ -74,8 +74,7 @@ func Execute(request *Request) {
 			channelB <- "Result Operation C"
 		}
 	}(*request)
-	timeout := false
-	for i := 0; i < 3 && !timeout; i++ {
+	for i := 0; i < 3; i++ {
 		select {
 		case resultA := <-channelA:
 			request.ResultA = resultA
@@ -84,17 +83,14 @@ func Execute(request *Request) {
 		case resultC := <-channelC:
 			request.ResultC = resultC
 		case <-time.After(20 * time.Millisecond):
-			//fmt.Printf("Request ID %s timeout\n", request.Id)
-			timeout = true
 			break
 		}
 	}
 	t2 := time.Now()
 	diff := t2.Sub(t1)
 	idx, _ := strconv.Atoi(request.Id)
-	avgExecutionRequest[idx - 1] = diff.Milliseconds()
+	avgExecutionRequest[idx-1] = diff.Milliseconds()
 }
-
 
 func main() {
 	LoadRequests("requests-lowlatency.csv")
